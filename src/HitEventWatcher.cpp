@@ -66,13 +66,31 @@ RE::BSEventNotifyControl HitEventWatcher::ProcessEvent(const RE::TESHitEvent& ev
 
 			int partType = evn.hitdata.bodypartType;
 			if (partType == -1) {
-				//손은 파트 타입이 지정되지 않아있어서 하드코딩
-				if (parent->name == "LArm_Hand") {
-					partType = 6;
-				} else if (parent->name == "RArm_Hand") {
-					partType = 8;
+				//파트 타입이 지정되지 않은 경우 충돌 노드 이름으로 판정
+				const auto& name = parent->name;
+				if (name.contains("Head") || name.contains("Face") || name.contains("Eye") || name.contains("Jaw") || name.contains("Mouth")) {
+					partType = 1;  // Head1
+				} else if (name.contains("Spine") || name.contains("Chest") || name.contains("Breast")) {
+					partType = 0;  // Torso
+				} else if (name.contains("Pelvis") || name.contains("Hip")) {
+					partType = 20;  // Pelvis
+				} else if (name.contains("LArm") || name.contains("L_Arm") || name.contains("LForeArm") || name.contains("L_ForeArm")) {
+					partType = 6;  // LeftArm1
+				} else if (name.contains("RArm") || name.contains("R_Arm") || name.contains("RForeArm") || name.contains("R_ForeArm")) {
+					partType = 8;  // RightArm1
+				} else if (name.contains("LLeg") || name.contains("L_Leg") || name.contains("LCalf") || name.contains("L_Calf") || name.contains("LThigh") || name.contains("L_Thigh")) {
+					partType = 10;  // LeftLeg1
+				} else if (name.contains("RLeg") || name.contains("R_Leg") || name.contains("RCalf") || name.contains("R_Calf") || name.contains("RThigh") || name.contains("R_Thigh")) {
+					partType = 13;  // RightLeg1
+				} else if (name.contains("LFoot") || name.contains("L_Foot")) {
+					partType = 23;  // LeftFoot
+				} else if (name.contains("RFoot") || name.contains("R_Foot")) {
+					partType = 24;  // RightFoot
 				} else {
-					partType = 0;
+					partType = 0;  // Torso (기본값)
+				}
+				if (shouldLog) {
+					logger::info("bodypartType was -1, resolved to {} from node name {}", partType, name.c_str());
 				}
 			}
 
